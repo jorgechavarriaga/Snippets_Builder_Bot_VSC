@@ -9,12 +9,14 @@
 			"import { createBot, createProvider, createFlow, addKeyword, utils, EVENTS } from '@builderbot/bot'",
 			"import { MemoryDB as Database } from '@builderbot/bot'",
 			"import { BaileysProvider as Provider } from '@builderbot/provider-baileys'",
+			"import { config } from 'dotenv'",
+			"config()",
 			"",
 			"const PHONE_NUMBER = process.env.PHONE_NUMBER",
 			"const PORT = process.env.PORT ?? 3008",
 			"",
 			"const welcomeFlow = addKeyword<Provider, Database>(EVENTS.WELCOME)",
-			"\t.addAnswer(``)",
+			"\t.addAnswer(`$0`)",
 			"",
 			"const main = async () => {",
 			"\tconst adapterFlow = createFlow([welcomeFlow])",
@@ -157,5 +159,22 @@
 			"await waitT($0)"
 		],
 		"description": "Await wait Function"
-	}
+	},
+	"Start Modularize Flow": {
+		"prefix": "smf",
+		"body": [
+			"import { addKeyword, EVENTS } from '@builderbot/bot'",
+			"",
+			"const $1 = addKeyword(EVENTS.ACTION)",
+			".addAnswer(`$2`)",
+			".addAction(",
+			"\t\tasync (ctx, { flowDynamic }) => { ",
+			"\t\t\t$3",
+			"\t\t}",
+			")",
+			"",
+			"export default $1",
+		],
+		"description": "Modularize Flow"
+	},
 }
