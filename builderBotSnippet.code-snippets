@@ -1,0 +1,161 @@
+// Snippets to be used with Builder Bot 
+// By: Jorge Chavarriaga
+// Web: https://www.chavazystem.tech
+// Email: jorge.chavarriaga@chavazystem.tech - jorge.chavarriaga@gmail.com
+{
+	"Bot Start": {
+		"prefix": "bs",
+		"body": [
+			"import { createBot, createProvider, createFlow, addKeyword, utils, EVENTS } from '@builderbot/bot'",
+			"import { MemoryDB as Database } from '@builderbot/bot'",
+			"import { BaileysProvider as Provider } from '@builderbot/provider-baileys'",
+			"",
+			"const PHONE_NUMBER = process.env.PHONE_NUMBER",
+			"const PORT = process.env.PORT ?? 3008",
+			"",
+			"const welcomeFlow = addKeyword<Provider, Database>(EVENTS.WELCOME)",
+			"\t.addAnswer(``)",
+			"",
+			"const main = async () => {",
+			"\tconst adapterFlow = createFlow([welcomeFlow])",
+			"",
+			"\tconst adapterProvider = createProvider(Provider, { usePairingCode: true, phoneNumber: PHONE_NUMBER })",
+			"\tconst adapterDB = new Database()",
+			"",
+			"\tconst { handleCtx, httpServer } = await createBot(",
+			"\t\t{",
+			"\t\t\tflow: adapterFlow,",
+			"\t\t\tprovider: adapterProvider,",
+			"\t\t\tdatabase: adapterDB,",
+			"\t\t}",
+			"\t)",
+			"",
+			"\thttpServer(+PORT)",
+			"",
+			"\tadapterProvider.http.server.post(",
+			"\t\t'/v1/messages',",
+			"\t\thandleCtx(async (bot, req, res) => {",
+			"\t\t\tconst { number, message, urlMedia } = req.body",
+			"\t\t\tawait bot.sendMessage(number, message, { media: urlMedia ?? null })",
+			"\t\t\treturn res.end('sended')",
+			"\t\t})",
+			"\t)",
+			"",
+			"\tadapterProvider.http.server.post(",
+			"\t\t'/v1/register',",
+			"\t\thandleCtx(async (bot, req, res) => {",
+			"\t\t\tconst { number, name } = req.body",
+			"\t\t\tawait bot.dispatch('REGISTER_FLOW', { from: number, name })",
+			"\t\t\treturn res.end('trigger')",
+			"\t\t})",
+			"\t)",
+			"",
+			"\tadapterProvider.http.server.post(",
+			"\t\t'/v1/blacklist',",
+			"\t\thandleCtx(async (bot, req, res) => {",
+			"\t\t\tconst { number, intent } = req.body",
+			"\t\t\tif (intent === 'remove') bot.blacklist.remove(number)",
+			"\t\t\tif (intent === 'add') bot.blacklist.add(number)",
+			"",
+			"\t\t\t\tres.writeHead(200, { 'Content-Type': 'application/json' })",
+			"\t\t\t\treturn res.end(JSON.stringify({ status: 'ok', number, intent }))",
+			"\t\t\t})",
+			"\t\t)",
+			"}",
+			"",
+			"main()"
+		],
+		"description": "Add Bot Start Base code"
+	},
+	"Add Answer": {
+		"prefix": "aar",
+		"body": [
+			".addAnswer(",
+			"\t'$1',",
+			"\tnull,",
+			"\tasync (ctx, { flowDynamic, gotoFlow, endFlow, fallBack, provider, state }) => {",
+			"\t\t$0",
+			"\t}",
+			")"
+		],
+		"description": "Add an answer to a flow"
+	},
+	"Add Action": {
+		"prefix": "aan",
+		"body": [
+			".addAction(",
+			"\tasync (ctx, { flowDynamic, gotoFlow, endFlow, fallBack, provider, state }) => {",
+			"\t\t$0",
+			"\t}",
+			")"
+		],
+		"description": "Add an action to a flow"
+	},
+	"FlowDynamic Media": {
+		"prefix": "fdm",
+		"body": [
+			"await flowDynamic([",
+			"\t{",
+			"\t\tbody: '$1',",
+			"\t\tmedia: '$0'",
+			"\t}",
+			"])"
+		],
+		"description": "Add flowDynamic with Body and Media"
+	},
+	"FlowDynamic String": {
+		"prefix": "fd",
+		"body": [
+			"await flowDynamic('$0')",
+		],
+		"description": "Add flowDynamic String "
+	},
+	"Return FallBack": {
+		"prefix": "rf",
+		"body": [
+			"return fallBack($0)"
+		],
+		"description": "Return fallBack"
+	},
+	"Return GotoFlow": {
+		"prefix": "rg",
+		"body": [
+			"return gotoFlow($0)"
+		],
+		"description": "Return gotoFlow"
+	},
+	"Return endFlow": {
+		"prefix": "re",
+		"body": [
+			"return endFlow($0)"
+		],
+		"description": "Return endFlow"
+	},
+	"Capture True": {
+		"prefix": "ct",
+		"body": [
+			"{ capture: true },"
+		],
+		"description": "Capture True"
+	},
+	"Wait Function": {
+		"prefix": "wf",
+		"body": [
+			"const waitT = (ms: number) => {",
+			"\treturn new Promise((resolve) => {",
+			"\t\tsetTimeout(() => {",
+			"\t\t\tresolve(ms);",
+			"\t\t}, ms)",
+			"\t})",
+			"}"
+		],
+		"description": "Wait Function"
+	},
+	"Await wait Function": {
+		"prefix": "w",
+		"body": [
+			"await waitT($0)"
+		],
+		"description": "Await wait Function"
+	}
+}
